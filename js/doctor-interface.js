@@ -1,13 +1,13 @@
 var apiKey = require('./../.env').apiKey;
 
 $(document).ready(function() {
-  $('#symptomDoctor').click(function() {
+  $('#searchSymptom').click(function() {
     let symptom = $('#symptom').val();
     $('#symptom').val("");
 
     let promise = new Promise(function(resolve, reject) {
       let request = new XMLHttpRequest();
-      let url = `https://api.betterdoctor.com/2016-03-01/doctors?query=${symptom}&location=37.773%2C-122.413%2C100&user_location=37.773%2C-122.413&sort=distance-asc&skip=0&limit=10&user_key=${apiKey}`;
+      let url = `https://api.betterdoctor.com/2016-03-01/doctors?query=${symptom}&location=47.606%2C-122.332%2C100&user_location=47.606%2C-122.332&sort=distance-asc&skip=0&limit=10&user_key=${apiKey}`;
       request.onload = function() {
         if (this.status === 200) {
           resolve(request.response);
@@ -20,69 +20,30 @@ $(document).ready(function() {
     });
 
     promise.then(function(response) {
-      let body = JSON.parse(response);
-      $('.showDoctors').append(`${body.data.practices.name}`+"<br>"+ `${body.data.practices.visit_address}`+"<br>"+`${body.data.practices.phones}`+"<br>"+ `${body.data.practices.website}`+"<br>"+`"Accepting new patients:"${body.data.practices.accepts_new_patients}`);
+      let doctor = JSON.parse(response);
+      response.data.forEach(function(doctor) {
+      $('.showDoctors').append(`${doctor.profile.first_name}`+" "+`${doctor.profile.last_name}`+"<br>");
     }, function(error) {
       $('.showErrors').text(`There was an error processing your request: ${error.message}`);
     });
   });
 });
-
-//using curl and promises .then .fail
-// $(document).ready(function() {
-//   $('#weatherLocation').click(function() {
-//     let city = $('#location').val();
-//     $('#location').val("");
-//     $.get(`http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`).then(function(response) {
-//       $('.showHumidity').text(`The humidity in ${city} is ${response.main.humidity}%`);
-//       $('.showTemp').text(`The temperature in Kelvins is ${response.main.temp} degrees.`);
-//     }).fail(function(error) {
-//       $('.showErrors').text(`There was an error processing your request: ${error.responseText}. Please try again.`);
-//     });
-//   });
-// });
-
-// Javascript Method
-// $(document).ready(function() {
-//   $('#weatherLocation').click(function() {
-//     let city = $('#location').val();
-//     $('#location').val("");
-//
-//     let request = new XMLHttpRequest();
-//     let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
-//
-//     request.onreadystatechange = function() {
-//       if (this.readyState === 4 && this.status === 200) {
-//         let response = JSON.parse(this.responseText);
-//         getElements(response);
-//       }
-//     }
-//
-//     request.open("GET", url, true);
-//     request.send();
-//
-//     const getElements = function(response) {
-//       $('.showHumidity').text(`The humidity in ${city} is ${response.main.humidity}%`);
-//       $('.showTemp').text(`The temperature in Kelvins is ${response.main.temp} degrees.`);
-//     }
-//   });
-// });
-
-//jQuery option
+});
 
 // $(document).ready(function() {
-//   $('#weatherLocation').click(function() {
-//     let city = $('#location').val();
-//     $('#location').val("");
+//   $('#searchSymptom').click(function() {
+//     let symptom = $('#symptom').val();
+//     $('#symptom').val("");
 //     $.ajax({
-//       url: `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`,
+//       url: `https://api.betterdoctor.com/2016-03-01/doctors?query=${symptom}&location=47.606%2C-122.332%2C100&user_location=47.606%2C-122.332&sort=distance-asc&skip=0&limit=10&user_key=${apiKey}`,
 //       type: 'GET',
 //       data: {
 //         format: 'json'
 //       },
 //       success: function(response) {
-//         $('.showHumidity').text(`The humidity in ${city} is ${response.main.humidity}%`);
-//         $('.showTemp').text(`The temperature in Kelvins is ${response.main.temp}.`);
+//         response.data.forEach(function(doctor) {
+//         $('.showDoctors').append(`${doctor.profile.first_name}`+" "+`${doctor.profile.last_name}`+"<br>");
+//       });
 //       },
 //       error: function() {
 //         $('#errors').text("There was an error processing your request. Please try again.")
@@ -90,3 +51,25 @@ $(document).ready(function() {
 //     });
 //   });
 // });
+
+$(document).ready(function() {
+  $('#searchName').click(function() {
+    let name = $('#doctorName').val();
+    $('#doctorName').val("");
+    $.ajax({
+      url: `https://api.betterdoctor.com/2016-03-01/doctors?query=${name}&location=47.606%2C-122.332%2C100&user_location=47.606%2C-122.332&sort=distance-asc&skip=0&limit=10&user_key=${apiKey}`,
+      type: 'GET',
+      data: {
+        format: 'json'
+      },
+      success: function(response) {
+        response.data.forEach(function(doctor) {
+        $('.showDoctors').append(`${doctor.profile.first_name}`+" "+`${doctor.profile.last_name}`+"<br>"+ `${doctor.visit_address}`+"<br>"+`${doctor.phones}`+"<br>"+ `${doctor.website}`+"<br>"+`"Accepting new patients:"${doctor.accepts_new_patients}`+"<br>");
+      });
+      },
+      error: function() {
+        $('#errors').text("There was an error processing your request. Please try again.")
+      }
+    });
+  });
+});

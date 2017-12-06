@@ -4,8 +4,28 @@ $(document).ready(function(){
 
  let doctorObj = new Doctor();
  doctorObj.getConditions();
+ doctorObj.getDoctorByName();
+
+ $(".doctorName").click(function(){
+ let name = $('.searchName').val();
+ try {
+   if(name == "non"){
+     throw("Please enter a name");
+   }
+   else{
+     $('.searchPage').addClass('hide');
+     doctorObj.getDoctorByName(name);
+     console.log(doctorObj.getDoctorByName(name));
+   }
+ } catch (e) {
+   $(".searchPage").prepend(`<div class="alert alert-warning alert-dismissable fade in">
+  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+  ${e}
+</div>`);
+}
+});
+
  $(".findDoc").click(function(){
-   let name = $('.doctorName').val();
    let condition = $('.conditionList').val();
    try {
      if(condition == "non"){
